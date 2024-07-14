@@ -19,6 +19,7 @@
     var userName = localStorage.getItem("userName");
     const choices = document.getElementsByClassName("choice-text");
     const gameElement = document.getElementById("container");
+    var newUser = " ";
 
     document.onreadystatechange = () => {
       if (document.readyState == "complete") {
@@ -48,9 +49,7 @@
           id="username"
           placeholder="username"
         />
-        <div class="selectLevels">
-          <div class="difficulty">Easy</div>
-        </div>
+       
         <div class="btn" onclick="playQuiz()">Play</div>
         <button class="btn results" onclick="showResult()">High Score</button>
       </div>`;
@@ -60,12 +59,12 @@
       var userName = document.getElementById("username");
       console.log(userName.value);
       if (userName.value == null || userName.value == "") {
-        console.log(userName);
         var ptag = document.createElement("p");
         ptag.innerHTML = "Enter userName First";
         ptag.classList.add("invalid");
         userName.insertAdjacentElement("afterend", ptag);
       } else {
+        newUser = userName.value;
         document.getElementById("home").style.display = "none";
         localStorage.setItem("userName", userName.value);
         getDataFromApi();
