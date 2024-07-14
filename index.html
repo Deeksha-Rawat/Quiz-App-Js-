@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Quiz App</title>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div class="container" id="container">
+      <!-- <div id="loader"></div> -->
+    </div>
+  </body>
+  <script>
+    var questions = [];
+    let answersChoice = [];
+    let max_Questions = 4;
+    let currentQuestionIndex = 0;
+    let questionCounter = 0;
+    let score = 0;
+    var userName = localStorage.getItem("userName");
+    const choices = document.getElementsByClassName("choice-text");
+    const gameElement = document.getElementById("container");
+
+    document.onreadystatechange = () => {
+      if (document.readyState == "complete") {
+        startPlaying();
+      }
+    };
+    function startPlaying() {
+      gameElement.innerHTML = `<div id="home" class="flex-center flex-column" style="display: flex">
+        <h1>Quiz App</h1>
+        <input
+          type="text"
+          name="username"
+          id="username"
+          placeholder="username"
+        />
+        <div class="btn" onclick="playQuiz()">Play</div>
+        <button class="btn results" onclick="showResult()">High Score</button>
+      </div>`;
+      showHighScoreBtn();
+    }
+    function createQuiz() {
+      gameElement.innerHTML = `<div id="home" class="flex-center flex-column" style="display: flex">
+        <h1>Quiz App</h1>
+        <input
+          type="text"
+          name="username"
+          id="username"
+          placeholder="username"
+        />
+        <div class="btn" onclick="playQuiz()">Play</div>
+        <button class="btn results" onclick="showResult()">High Score</button>
+      </div>`;
+      showHighScoreBtn();
+    }
+    function playQuiz() {
+      var userName = document.getElementById("username");
+      console.log(userName.value);
+      if (userName.value == null || userName.value == "") {
+        console.log(userName);
+        var ptag = document.createElement("p");
+        ptag.innerHTML = "Enter userName First";
+        ptag.classList.add("invalid");
+        userName.insertAdjacentElement("afterend", ptag);
+      } else {
+        document.getElementById("home").style.display = "none";
+        localStorage.setItem("userName", userName.value);
+        getDataFromApi();
+      }
+      showHighScoreBtn();
+    }
+
+    function getDataFromApi() {
+      var myHeaders = new Headers();
+      var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+      };
+      let api = `https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple`;
+      return fetch(api, requestOptions)
+        .then((response) => response.json())
+        .then((res) => {
+          questions = res.results.map((elem) => {
+            const formattedQuestion = {
+              question: elem.question,
+              answers: [...elem.incorrect_answers, elem.correct_answer],
+              correct_answer: elem.correct_answer,
+            };
+
+            formattedQuestion.answers.sort(() => Math.random() - 0.5);
+            return formattedQuestion;
+          });
+
+          setGame();
+          displayNextQuestion();
+          console.log(questions);
+        })
+        .catch((error) => console.error("Error:", error));
+    }
+
+    function setGame() {
+      gameElement.innerHTML = `
+       <h1>${userName}</h1>
+         <div id="hud">
+           <div id="hud-item">
+             <p id="progressText" class="hud-prefix">Question</p>
+             <div id="progressBar">
+               <div id="progressBarFull"></div>
+             </div>
+           </div>
+           <div id="hud-item">
+             <p class="hud-prefix">Score</p>
+             <h1 class="hud-main-text" id="score">0</h1>
+           </div>
+         </div>
+         <h2 id="question"></h2>
+         <div class="choice-container">
+           <p class="choice-prefix">A</p>
+           <p class="choice-text" data-number="1" onclick="selectAnswer(this)"></p>
+         </div>
+         <div class="choice-container">
+           <p class="choice-prefix">B</p>
+           <p class="choice-text" data-number="2" onclick="selectAnswer(this)"></p>
+         </div>
+         <div class="choice-container">
+           <p class="choice-prefix">C</p>
+           <p class="choice-text" data-number="3" onclick="selectAnswer(this)"></p>
+         </div>
+         <div class="choice-container">
+           <p class="choice-prefix">D</p>
+           <p class="choice-text" data-number="4" onclick="selectAnswer(this)"></p>
+         </div>`;
+    }
+    function displayNextQuestion() {
+      if (currentQuestionIndex >= 4) {
+        getResultSlide();
+        return;
+      }
+      const currentQuestion = questions[currentQuestionIndex];
+      document.getElementById("question").innerHTML = currentQuestion.question;
+
+      for (let i = 0; i < 4; i++) {
+        choices[i].innerHTML = currentQuestion.answers[i];
+      }
+      document.getElementById("progressText").innerHTML = `Question ${
+        currentQuestionIndex + 1
+      }/3`;
+      Array.from(choices).forEach((choice) => {
+        choice.classList.remove("right-answer", "wrong-answer");
+      });
+    }
+    function selectAnswer(el) {
+      var selectedanswer = el.innerHTML;
+      if (selectedanswer == questions[currentQuestionIndex].correct_answer) {
+        el.classList.add("right-answer");
+        score += 10;
+        document.getElementById("score").innerHTML = score;
+      } else {
+        el.classList.add("wrong-answer");
+        Array.from(choices).forEach((choice) => {
+          if (
+            choice.innerHTML === questions[currentQuestionIndex].correct_answer
+          ) {
+            choice.classList.add("right-answer");
+          }
+        });
+      }
+      currentQuestionIndex++;
+      setTimeout(displayNextQuestion, 1000);
+    }
+
+    function getResultSlide() {
+      gameElement.innerHTML = ` <div class="scoreslide"><h1>Score: ${score}</h1><form>
+
+           <button
+            class="btn"
+            id="savedbtn"
+             onclick="saveHighScore(event)">
+             Save
+           </button>
+         </form>
+         <button class="btn" onclick="createQuiz()">Play Again</button>
+         <button class="btn results" onclick="showResult()">High Score</button></div>`;
+    }
+    // getResultSlide();
+
+    function saveHighScore(e) {
+      e.preventDefault();
+      document.getElementById("savedbtn").innerHTML = "Saved!";
+
+      const newHighScore = {
+        userName: userName,
+        score: score,
+      };
+
+      let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+      const existingHighScoreIndex = highScores.findIndex(
+        (elem) => elem.userName === userName
+      );
+      if (existingHighScoreIndex !== -1) {
+        if (highScores[existingHighScoreIndex].score < mostRecentScore) {
+          highScores[existingHighScoreIndex].score = mostRecentScore;
+        }
+      } else {
+        highScores.push(newHighScore);
+      }
+
+      localStorage.setItem("highScores", JSON.stringify(highScores));
+    }
+
+    function showResult() {
+      gameElement.innerHTML = `<div id="highScores" class="flex-center flex-column">
+         <h1 id="finalScore">High Scores</h1>
+         <ul id="highScoresList"></ul>
+         <a class="btn" href="/">Go Home</a>
+       </div>`;
+
+      const highScoresList = document.getElementById("highScoresList");
+      const highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+      highScoresList.innerHTML = highScores
+        .map((el) => {
+          return `<li class="high-score"><p>${el.userName} </p><p>${el.score}</p></li>`;
+        })
+        .join("");
+    }
+    function showHighScoreBtn() {
+      if (localStorage.getItem("highScores") != null) {
+        document.querySelector(".results").style.display = "block";
+      }
+    }
+  </script>
+</html>
