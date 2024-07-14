@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Quiz App</title>
+    <title>QuizzyGenius</title>
     <link rel="stylesheet" href="app.css" />
   </head>
   <body>
@@ -14,10 +14,7 @@
   </body>
   <script>
     var questions = [];
-    let answersChoice = [];
-    let max_Questions = 4;
     let currentQuestionIndex = 0;
-    let questionCounter = 0;
     let score = 0;
     var userName = localStorage.getItem("userName");
     const choices = document.getElementsByClassName("choice-text");
@@ -30,12 +27,12 @@
     };
     function startPlaying() {
       gameElement.innerHTML = `<div id="home" class="flex-center flex-column" style="display: flex">
-        <h1>Quiz App</h1>
+        <h1>QuizzyGenius</h1>
         <input
           type="text"
           name="username"
           id="username"
-          placeholder="username"
+          placeholder="Username"
         />
         <div class="btn" onclick="playQuiz()">Play</div>
         <button class="btn results" onclick="showResult()">High Score</button>
@@ -44,13 +41,16 @@
     }
     function createQuiz() {
       gameElement.innerHTML = `<div id="home" class="flex-center flex-column" style="display: flex">
-        <h1>Quiz App</h1>
+        <h1>QuizzyGenius</h1>
         <input
           type="text"
           name="username"
           id="username"
           placeholder="username"
         />
+        <div class="selectLevels">
+          <div class="difficulty">Easy</div>
+        </div>
         <div class="btn" onclick="playQuiz()">Play</div>
         <button class="btn results" onclick="showResult()">High Score</button>
       </div>`;
@@ -107,9 +107,6 @@
          <div id="hud">
            <div id="hud-item">
              <p id="progressText" class="hud-prefix">Question</p>
-             <div id="progressBar">
-               <div id="progressBarFull"></div>
-             </div>
            </div>
            <div id="hud-item">
              <p class="hud-prefix">Score</p>
@@ -147,7 +144,7 @@
       }
       document.getElementById("progressText").innerHTML = `Question ${
         currentQuestionIndex + 1
-      }/3`;
+      }/4`;
       Array.from(choices).forEach((choice) => {
         choice.classList.remove("right-answer", "wrong-answer");
       });
