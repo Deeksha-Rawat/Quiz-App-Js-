@@ -56,17 +56,18 @@
       showHighScoreBtn();
     }
     function playQuiz() {
-      var userName = document.getElementById("username");
-      console.log(userName.value);
-      if (userName.value == null || userName.value == "") {
+      var userNameInput = document.getElementById("username");
+      console.log(userNameInput.value);
+      if (userNameInput.value == null || userNameInput.value == "") {
         var ptag = document.createElement("p");
         ptag.innerHTML = "Enter userName First";
         ptag.classList.add("invalid");
-        userName.insertAdjacentElement("afterend", ptag);
+        userNameInput.insertAdjacentElement("afterend", ptag);
       } else {
-        newUser = userName.value;
+        newUser = userNameInput.value;
+        console.log(newUser);
         document.getElementById("home").style.display = "none";
-        localStorage.setItem("userName", userName.value);
+        localStorage.setItem("userName", userNameInput.value);
         getDataFromApi();
       }
       showHighScoreBtn();
