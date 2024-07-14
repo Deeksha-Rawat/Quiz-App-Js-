@@ -67,7 +67,7 @@
         newUser = userNameInput.value;
         console.log(newUser);
         document.getElementById("home").style.display = "none";
-        localStorage.setItem("userName", userNameInput.value);
+        localStorage.setItem("userName", newUser);
         getDataFromApi();
       }
       showHighScoreBtn();
@@ -103,7 +103,7 @@
 
     function setGame() {
       gameElement.innerHTML = `
-       <h1>${userName}</h1>
+       <h1>${newUser}</h1>
          <div id="hud">
            <div id="hud-item">
              <p id="progressText" class="hud-prefix">Question</p>
