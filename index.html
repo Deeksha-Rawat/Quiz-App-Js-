@@ -16,10 +16,11 @@
     var questions = [];
     let currentQuestionIndex = 0;
     let score = 0;
-    var userName = localStorage.getItem("userName");
+    //var userName = localStorage.getItem("userName");
     const choices = document.getElementsByClassName("choice-text");
     const gameElement = document.getElementById("container");
     var newUser = " ";
+    console.log(newUser);
 
     document.onreadystatechange = () => {
       if (document.readyState == "complete") {
@@ -189,17 +190,17 @@
       document.getElementById("savedbtn").innerHTML = "Saved!";
 
       const newHighScore = {
-        userName: userName,
+        userName: newUser,
         score: score,
       };
 
       let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
       const existingHighScoreIndex = highScores.findIndex(
-        (elem) => elem.userName === userName
+        (elem) => elem.userName === newUser
       );
       if (existingHighScoreIndex !== -1) {
-        if (highScores[existingHighScoreIndex].score < mostRecentScore) {
-          highScores[existingHighScoreIndex].score = mostRecentScore;
+        if (highScores[existingHighScoreIndex].score < score) {
+          highScores[existingHighScoreIndex].score = score;
         }
       } else {
         highScores.push(newHighScore);
@@ -212,7 +213,7 @@
       gameElement.innerHTML = `<div id="highScores" class="flex-center flex-column">
          <h1 id="finalScore">High Scores</h1>
          <ul id="highScoresList"></ul>
-         <a class="btn" href="/">Go Home</a>
+         <a class="btn" href="https://deeksha-rawat.github.io/Quiz-App-Js-/">Go Home</a>
        </div>`;
 
       const highScoresList = document.getElementById("highScoresList");
